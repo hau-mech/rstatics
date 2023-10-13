@@ -1,35 +1,22 @@
----
-format: gfm
----
-
-```{r, echo = FALSE}
-
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "man/figures/README-"
-)
-
-```
 
 # rstatics
 
 ## Overview
 
-*rstatics* package provides functions for the course MAS142 Statics and Mechanics of Materials at HVL. 
+*rstatics* package provides functions for the course MAS142 Statics and
+Mechanics of Materials at HVL.
 
 ## Installation
 
-```{r, eval = FALSE}
+``` r
 
 if (!require("remotes")) install.packages("remotes")
 remotes::install_github("hau-mech/rstatics")
-
 ```
 
 ## Usage
 
-```{r, message = FALSE}
+``` r
 
 library(rstatics)
 library(ggplot2)
@@ -43,5 +30,6 @@ loads <- tibble::tribble( ~x, ~force,
 plot_internal_forces(.beam_length = 0.825, 
                      .resolution = 0.0001, 
                      .loads = loads)
-
 ```
+
+![](man/figures/README-unnamed-chunk-3-1.png)
