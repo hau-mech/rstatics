@@ -36,40 +36,48 @@ plot_internal_forces <- function(.beam_length,
     dplyr::mutate(moment = cumsum(shear))
 
   # Punctual forces
-  force <- ggplot() +
+  p_loads <- ggplot() +
     # Beam
     geom_segment(aes(x = 0, y = 0, xend = .beam_length, yend = 0),
                  linewidth = 4, colour = "darkgrey") +
     # Puntual forces
-    geom_segment(data = loads,
-                 aes(x = x, y = 0, xend = x, yend = force),
-                 arrow = arrow(type = "closed", length = unit(0.2, "inches")),
-                 colour = "blue", linewidth = 1) +
+    geom_segment(data = .loads,
+                 aes(x = x, y = force, xend = x, yend = 0),
+                 arrow = arrow(type = "closed", length = unit(0.1, "inches")),
+                 colour = "blue",
+                 linewidth = 0.75) +
+    scale_y_reverse() +
     labs(x = "Position [m]",
          y = "F [N]", title = "Load forces") +
     theme_minimal()
 
   # Plot shear forces
-  shear <- ggplot(df, aes(x = x, y = shear)) +
+  p_shear <- ggplot() +
     geom_hline(yintercept = 0) +
-    geom_line(colour = "red", linewidth = 2) +
+    geom_line(data = df,
+              aes(x = x, y = shear),
+              colour = "red",
+              linewidth = 0.75) +
     labs(x = "Position [m]",
          y = "F [N]",
          title = "Shear Force Diagram") +
     theme_minimal()
 
   # Plot moment
-  moment <- ggplot(df, aes(x = x, y = moment)) +
+  p_moment <- ggplot() +
     geom_hline(yintercept = 0) +
-    geom_line(colour = "red", linewidth = 2) +
+    geom_line(data = df,
+              aes(x = x, y = moment),
+              colour = "red",
+              linewidth = 0.75) +
     labs(x = "Position [m]",
          y = "M [Nmm]",
          title = "Moment Diagram") +
     theme_minimal()
 
   # Diagrams
-  diagram_plot <- force / shear / moment
+  plot_diagrams <- p_loads / p_shear / p_moment
 
-  return(diagram_plot)
+  return(plot_diagrams)
 
 }
