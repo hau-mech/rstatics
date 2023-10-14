@@ -19,11 +19,11 @@
 #'                                  .web = 38.1,
 #'                                  .web_thickness = 6.4)
 #'
-#' gg_t_beam(.flange = 38.1,
-#'           .flange_thickness = 6.4,
-#'           .web = 38.1,
-#'           .web_thickness = 6.4,
-#'           fill = "darkgrey") +
+#' plot_t_beam(.flange = 38.1,
+#'             .flange_thickness = 6.4,
+#'             .web = 38.1,
+#'             .web_thickness = 6.4,
+#'             fill = "darkgrey") +
 #'   geom_point(data = centroid, aes(x, y), col = "red", size = 4) +
 #'   geom_text(data = centroid, aes(x = x,
 #'                                  y = y,
