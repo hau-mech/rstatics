@@ -36,11 +36,11 @@
 #'   annotate(geom = "text", x = 5.6, y = 38, label = paste("Iy = " , round(I[2]), "mm4"), hjust = "left") +
 #'   theme_bw()
 
-gg_t_beam <- function(.flange,
-                      .flange_thickness,
-                      .web,
-                      .web_thickness,
-                      ...) {
+plot_t_beam <- function(.flange,
+                        .flange_thickness,
+                        .web,
+                        .web_thickness,
+                        ...) {
   # Create a data frame for the T-section beam using tribble
   beam_data <- tibble::tribble( ~x, ~y,
                                 -.flange/2, 0,
