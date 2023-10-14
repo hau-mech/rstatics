@@ -2,5 +2,5 @@
 
 export(calculate_t_beam_I_centroid)
 export(calculate_t_beam_centroid)
-export(gg_t_beam)
 export(plot_internal_forces)
+export(plot_t_beam)
