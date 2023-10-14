@@ -32,18 +32,8 @@ plot_internal_forces <- function(.beam_length,
     dplyr::mutate(force = ifelse(is.na(force), 0, force)) |>
     # Shear forces
     dplyr::mutate(shear = cumsum(force)) |>
-    # Area of the shear
-    dplyr::mutate(area_shear = .resolution * shear)
-
-  # Bending moment
-  M <- matrix(0, length(df$x))
-  for (i in 1:(length(df$x)-1) ) {
-    M[i+1, ] = M[i, ] + df[i,]$area_shear
-  }
-  M <- as.data.frame(M)
-  names(M) <- c("moment")
-  # Add to df
-  df <- df |> dplyr::mutate(moment = M$moment)
+    # Bending moment
+    dplyr::mutate(moment = cumsum(shear))
 
   # Punctual forces
   force <- ggplot() +
