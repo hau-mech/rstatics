@@ -4,18 +4,26 @@
 \alias{plot_internal_forces}
 \title{Shear and moment diagrams}
 \usage{
-plot_internal_forces(.beam_length, .loads, .resolution = 0.01)
+plot_internal_forces(
+  .beam_length,
+  .point_force,
+  .distributed_load = NULL,
+  .resolution = 0.01
+)
 }
 \arguments{
 \item{.beam_length}{Longitude of the beam in meters}
 
-\item{.loads}{A tibble with punctual forces, it must have two columns (x and force).
-\code{x} is the position of the punctual force on the beam from the left edge.
-\code{force} is the magnitude of the force; positive forces going up, and negative
+\item{.point_force}{A tibble with punctual forces, it must have two columns (x and force).
+\code{x} is the position of the punctual force on the beam from the left edge \link{m}.
+\code{force} is the magnitude of the force \link{N}; positive forces going up, and negative
 forces going down. Support reactions should also be added in this data frame.}
 
+\item{.distributed_load}{A tibble with the distributed load \link{N/m}. It must have two columns
+(x and load), with the load values in steps of x = \code{.resolution}.}
+
 \item{.resolution}{The beam is discretised for the calculations, by default
-by steps of 0.01 m (but it can be adjusted if necessary).}
+by steps of 0.001 m (but it can be adjusted if necessary).}
 }
 \value{
 A ggplot2 object with the loads, shear diagram, and the bending moment.
@@ -27,11 +35,20 @@ Plot the shear and bending moment diagrams of a beam
 library(ggplot2)
 library(patchwork)
 
-loads <- tibble::tribble( ~x, ~force,
-                          0.025,  50,
-                          0.325, -50,
-                          0.500, -50,
-                          0.800,  50)
+# Problem definition
 
-plot_internal_forces(.beam_length = 0.825, .resolution = 0.0001, .loads = loads)
+beam_length = 6
+
+distributed_load <- tibble::tibble(x = seq(3, beam_length, 0.01)) |>
+  mutate(load = -(200/3)*x)
+
+point_force <- tibble::tribble( ~x, ~force,
+                                0,  200,
+                                6,  700)
+
+# Diagrams
+plot_internal_forces(.beam_length = beam_length,
+                     .point_force = point_force,
+                     .distributed_load = distributed_load
+)
 }

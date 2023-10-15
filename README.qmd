@@ -33,7 +33,7 @@ remotes::install_github("hau-mech/rstatics")
 ```{r, message = FALSE}
 
 library(rstatics)
-library(ggplot2)
+library(tidyverse)
 library(patchwork)
 
 # Problem definition
