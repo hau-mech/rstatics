@@ -19,7 +19,7 @@
 #'
 #' beam_length = 6
 #'
-#' distributed_load <- tibble::tibble(x = seq(3, beam_length, 0.01)) |>
+#' distributed_load <- tibble::tibble(x = seq(3, beam_length, 0.001)) |>
 #'   mutate(load = -(200/3)*x)
 #'
 #' point_force <- tibble::tribble( ~x, ~force,
@@ -35,7 +35,7 @@
 plot_internal_forces <- function(.beam_length,
                                 .point_force,
                                 .distributed_load = NULL,
-                                .resolution = 0.01) {
+                                .resolution = 0.001) {
 
   # Create points (x) for the internal forces (steps = .resolution)
   df <- tibble::tibble(x = seq(0, .beam_length, .resolution)) |>
