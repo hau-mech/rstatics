@@ -27,7 +27,7 @@ library(patchwork)
 # Problem definition
 beam_length = 6
 
-distributed_load <- tibble::tibble(x = seq(3, beam_length, 0.01)) |>
+distributed_load <- tibble::tibble(x = seq(3, beam_length, 0.001)) |>
   mutate(load = -(200/3)*x)
 
 point_force <- tibble::tribble( ~x, ~force,
