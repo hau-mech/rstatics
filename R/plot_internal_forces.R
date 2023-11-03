@@ -41,27 +41,42 @@ plot_internal_forces <- function(.beam_length,
   df <- tibble::tibble(x = seq(0, .beam_length, .resolution)) |>
     # Add point force location (.point_loads)
     dplyr::left_join(.point_force) |>
-    dplyr::mutate(force = replace_na(force, 0))
+    dplyr::mutate(force = replace_na(force, 0)) |>
+    # Add distributed load
+    # Convert x fo factor for the join (problems with floating numbers)
+    dplyr::mutate(x = as.factor(x)) |>
+    dplyr::left_join(mutate(.distributed_load, x = as.factor(x)), by = "x") |>
+    dplyr::mutate(load = replace_na(load, 0),
+                  # Discrete total load (dis_force)
+                  load_force = .resolution * load,
+                  # Get cummulative area of the load
+                  total_disc_force = force + load_force,
+                  # Shear
+                  shear = cumsum(total_disc_force)) |>
+    # Convert x again to number
+    dplyr::mutate(x = as.numeric(as.character(x)))
+
+  # Bending moment ----
+  df <- df |>
+    # Area of the shear
+    dplyr::mutate(area_shear = .resolution * shear)
+
+  # Calculate Bending moment
+  M <- matrix(0, length(df$x))
+  for (i in 1:(length(df$x)-1) ) {
+    M[i+1, ] = M[i, ] + df[i+1, ]$area_shear
+  }
+  M <- as.data.frame(M)
+  names(M) <- c("moment")
+
+  # Add to df
+  df <- df |> dplyr::mutate(moment = M$moment)
+
+  # Plots ----
 
   # Only punctual forces
 
   if(is.null(.distributed_load)) {
-
-    df <- df |>
-      dplyr::mutate(shear = cumsum(force)) |>
-      # Area of the shear
-      dplyr::mutate(area_shear = .resolution * shear)
-
-    # Bending moment
-    M <- matrix(0, length(df$x))
-    for (i in 1:(length(df$x)-1) ) {
-      M[i+1, ] = M[i, ] + df[i,]$area_shear
-    }
-    M <- as.data.frame(M)
-    names(M) <- c("moment")
-
-    # Add to df
-    df <- df |> dplyr::mutate(moment = M$moment)
 
     # Plots ----
     # Punctual forces
@@ -79,7 +94,7 @@ plot_internal_forces <- function(.beam_length,
       scale_y_reverse() +
       labs(x = "Position [m]",
            y = "F [N]", title = "Load forces") +
-      theme_minimal()
+      theme_light()
 
     # Plot shear forces
     p_shear <- ggplot() +
@@ -91,7 +106,7 @@ plot_internal_forces <- function(.beam_length,
       labs(x = "Position [m]",
            y = "F [N]",
            title = "Shear Force Diagram") +
-      theme_minimal()
+      theme_light()
 
     # Plot moment
     p_moment <- ggplot() +
@@ -103,56 +118,12 @@ plot_internal_forces <- function(.beam_length,
       labs(x = "Position [m]",
            y = "M [N*m]",
            title = "Moment Diagram") +
-      theme_minimal()
+      theme_light()
 
     # Diagrams
     plot_diagrams <- p_loads / p_shear / p_moment
 
   } else {
-
-    df <- df |>
-      # Convert x fo factor for the join (problems with floating numbers)
-      dplyr::mutate(x = as.factor(x)) |>
-      dplyr::left_join(.distributed_load |> mutate(x = as.factor(x)), by = "x") |>
-      dplyr::mutate(load = replace_na(load, 0)) |>
-      # Get cummulative area of the load
-      dplyr::mutate(area_load = .resolution * load,
-                    cum_area_load = cumsum(area_load)) |>
-      # Convert x again to number
-      dplyr::mutate(x = as.numeric(as.character(x)))
-
-    # Add shear due to point load
-    df <- df |>
-      dplyr::mutate(p_shear = cumsum(force))
-
-    # Shear due to Distributed load
-    DL <- matrix(0, length(df$x))
-    for (i in 1:(length(df$x)) ) {
-      DL[i, ] = DL[1, ] + df[i,]$cum_area_load
-    }
-    DL <- as.data.frame(DL)
-    names(DL) <- c("shear")
-
-    # Total shear force
-    df <- df |> dplyr::mutate(dl_shear = DL$shear) |>
-      mutate(shear = p_shear + dl_shear) |>
-      select(-p_shear, dl_shear)
-
-    # Bending moment ----
-    df <- df |>
-      # Area of the shear
-      dplyr::mutate(area_shear = .resolution * shear)
-
-    # Bending moment
-    M <- matrix(0, length(df$x))
-    for (i in 1:(length(df$x)-1) ) {
-      M[i+1, ] = M[i, ] + df[i,]$area_shear
-    }
-    M <- as.data.frame(M)
-    names(M) <- c("moment")
-
-    # Add to df
-    df <- df |> dplyr::mutate(moment = M$moment)
 
     # Plots ----
     # Punctual forces
