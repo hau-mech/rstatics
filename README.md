@@ -46,3 +46,4 @@ plot_internal_forces(.beam_length = beam_length,
 ```
 
 ![](man/figures/README-unnamed-chunk-3-1.png)
+
