@@ -7,6 +7,7 @@
 plot_internal_forces(
   .beam_length,
   .point_force,
+  .point_moment = NULL,
   .distributed_load = NULL,
   .resolution = 0.001
 )
@@ -18,6 +19,11 @@ plot_internal_forces(
 \code{x} is the position of the punctual force on the beam from the left edge \link{m}.
 \code{force} is the magnitude of the force \link{N}; positive forces going up, and negative
 forces going down. Support reactions should also be added in this data frame.}
+
+\item{.point_moment}{A tibble with punctual moments, it must have two columns (x and moment).
+\code{x} is the position of the punctual moment on the beam from the left edge \link{m}.
+\code{moment} is the magnitude of the moment \link{N*m}; positive moment counter-clockwise rotation,
+and negative moment clockwise rotation. Support moments (e.g. fixed support) should also be added in this data frame.}
 
 \item{.distributed_load}{A tibble with the distributed load \link{N/m}. It must have two columns
 (x and load), with the load values in steps of x = \code{.resolution}.}
