@@ -159,23 +159,27 @@ plot_internal_forces <- function(.beam_length,
 
   } else {
 
+    df2 <- .point_moment |>
+      mutate(curvature = ifelse(moment > 0, 0.6, -0.6))
     p_loads <- p_loads +
-      # Add point moments
-      geom_curve(data = .point_moment,
-                 aes(x = x,
-                     xend = x,
-                     y = ifelse(moment > 0,
-                                0.5 * max(.point_force$force),
-                                -0.5 * max(.point_force$force)),
-                     yend = ifelse(moment > 0,
-                                   -0.5 * max(.point_force$force),
-                                   0.5 * max(.point_force$force))
-                 ),
-                 arrow = arrow(length = unit(0.05, "npc"), type = "closed"),
-                 colour = "black",
-                 size = 0.75,
-                 curvature = 0.6,
-                 angle = 90)
+      lapply(split(df2, 1:nrow(df2)), function(dat) {
+        geom_curve(data = dat,
+                   aes(x = x,
+                       xend = x,
+                       y = ifelse(moment > 0,
+                                  0.5 * max(.point_force$force),
+                                  -0.5 * max(.point_force$force)),
+                       yend = ifelse(moment > 0,
+                                     -0.5 * max(.point_force$force),
+                                     0.5 * max(.point_force$force))
+                   ),
+                   arrow = arrow(length = unit(0.05, "npc"), type = "closed"),
+                   colour = "black",
+                   linewidth = 0.75,
+                   angle = 90,
+                   curvature = dat["curvature"])
+        }
+      )
 
     # With point moments
     plot_diagrams <- p_loads / p_shear / p_moment
