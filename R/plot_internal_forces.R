@@ -37,10 +37,10 @@
 #' )
 
 plot_internal_forces <- function(.beam_length,
-                                .point_force,
-                                .point_moment = NULL,
-                                .distributed_load = NULL,
-                                .resolution = 0.001) {
+                                 .point_force,
+                                 .point_moment = NULL,
+                                 .distributed_load = NULL,
+                                 .resolution = 0.001) {
 
   # Create points (x) for the internal forces (steps = .resolution)
   df <- tibble::tibble(x = seq(0, .beam_length, .resolution))
@@ -70,8 +70,8 @@ plot_internal_forces <- function(.beam_length,
   if(is.null(.point_moment)) {
 
     df <- df |>
-        # Discrete moment
-        dplyr::mutate(moment = cumsum(area_shear))
+      # Discrete moment
+      dplyr::mutate(moment = cumsum(area_shear))
 
   } else {
 
@@ -99,7 +99,7 @@ plot_internal_forces <- function(.beam_length,
     geom_segment(data = .point_force,
                  aes(x = x, y = force, xend = x, yend = 0),
                  arrow = arrow(type = "closed", length = unit(0.08, "inches")),
-                 colour = "blue",
+                 colour = "black",
                  linewidth = 0.75) +
     scale_y_reverse() +
     labs(x = "Position [m]",
@@ -130,26 +130,54 @@ plot_internal_forces <- function(.beam_length,
          title = "Moment Diagram") +
     theme_light()
 
-  # Only punctual forces
+  # Internal forces diagrams
 
   if(is.null(.distributed_load)) {
 
-    # Diagrams
+    # Diagrams Only punctual forces
     plot_diagrams <- p_loads / p_shear / p_moment
 
 
   } else {
 
-    # Plots ----
-    # Punctual forces
     p_loads <- p_loads +
-      # Distribute loads
+      # Add distribute loads
       geom_segment(data = .distributed_load,
                    aes(x = x, y = load, xend = x, yend = 0),
                    colour = "red",
                    linewidth = 0.01)
 
-    # Diagrams
+    # # With distributed load
+    # plot_diagrams <- p_loads / p_shear / p_moment
+
+  }
+
+  if(is.null(.point_moment)){
+
+    # With distributed load
+    plot_diagrams <- p_loads / p_shear / p_moment
+
+  } else {
+
+    p_loads <- p_loads +
+      # Add point moments
+      geom_curve(data = .point_moment,
+                 aes(x = x,
+                     xend = x,
+                     y = ifelse(moment > 0,
+                                0.5 * max(.point_force$force),
+                                -0.5 * max(.point_force$force)),
+                     yend = ifelse(moment > 0,
+                                   -0.5 * max(.point_force$force),
+                                   0.5 * max(.point_force$force))
+                 ),
+                 arrow = arrow(length = unit(0.05, "npc"), type = "closed"),
+                 colour = "black",
+                 size = 0.75,
+                 curvature = 0.6,
+                 angle = 90)
+
+    # With point moments
     plot_diagrams <- p_loads / p_shear / p_moment
 
   }
@@ -157,3 +185,4 @@ plot_internal_forces <- function(.beam_length,
   return(plot_diagrams)
 
 }
+
