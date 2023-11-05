@@ -173,9 +173,9 @@ plot_internal_forces <- function(.beam_length,
                                      -0.5 * max(.point_force$force),
                                      0.5 * max(.point_force$force))
                    ),
-                   arrow = arrow(length = unit(0.05, "npc"), type = "closed"),
+                   arrow = arrow(length = unit(0.08, "npc"), type = "closed"),
                    colour = "black",
-                   linewidth = 0.75,
+                   linewidth = 0.5,
                    angle = 90,
                    curvature = dat["curvature"])
         }
